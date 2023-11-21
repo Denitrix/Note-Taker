@@ -14,7 +14,7 @@ app.use(express.static("public"));
 
 app.get(
   //sends index.html to root path
-  "*",
+  "/",
   (req, res) => res.sendFile(path.join(__dirname, "/public/index.html"))
 );
 
