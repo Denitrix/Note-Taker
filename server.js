@@ -24,6 +24,19 @@ app.get(
   (req, res) => res.sendFile(path.join(__dirname, "/public/notes.html"))
 );
 
+app.get("/api/notes", (req, res) => {
+  console.log("test");
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      // Convert string into JSON object
+      const parsedData = JSON.parse(data);
+      res.json(parsedData);
+    }
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
