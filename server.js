@@ -25,17 +25,21 @@ app.get(
   (req, res) => res.sendFile(path.join(__dirname, "/public/notes.html"))
 );
 
-app.get("/api/notes", (req, res) => {
-  fs.readFile("./db/db.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-    } else {
-      // Convert string into JSON object
-      const parsedNotes = JSON.parse(data);
-      res.json(parsedNotes);
-    }
-  });
-});
+app.get(
+  //get method to read db.json
+  "/api/notes",
+  (req, res) => {
+    fs.readFile("./db/db.json", "utf8", (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        // Convert string into JSON object
+        const parsedNotes = JSON.parse(data);
+        res.json(parsedNotes);
+      }
+    });
+  }
+);
 
 app.post("/api/notes/", (req, res) => {
   const { title, text } = req.body;
@@ -52,17 +56,29 @@ app.post("/api/notes/", (req, res) => {
     } else {
       // Convert string into JSON object
       const parsedNotes = JSON.parse(data);
-      res.json(parsedNotes);
-      console.log(parsedNotes, newNote);
       parsedNotes.push(newNote);
+      res.json(parsedNotes);
+      fs.writeFile("./db/db.json", JSON.stringify(parsedNotes), (writeErr) =>
+        writeErr ? console.error(writeErr) : console.info("Note Saved")
+      );
+    }
+  });
+});
 
-      fs.writeFile(
-        "./db/db.json",
-        JSON.stringify(parsedNotes, null, 4),
-        (writeErr) =>
-          writeErr
-            ? console.error(writeErr)
-            : console.info("Successfully updated notes!")
+app.delete("/api/notes/:id", (req, res) => {
+  const id = req.params.id;
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      const parsedNotes = JSON.parse(data);
+      const toDelete = parsedNotes.findIndex((i) => i.id == id);
+      if (toDelete > -1) {
+        parsedNotes.splice(toDelete, 1);
+      }
+      res.json(parsedNotes);
+      fs.writeFile("./db/db.json", JSON.stringify(parsedNotes), (writeErr) =>
+        writeErr ? console.error(writeErr) : console.info(`Note ${id} Deleted`)
       );
     }
   });
