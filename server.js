@@ -26,14 +26,44 @@ app.get(
 );
 
 app.get("/api/notes", (req, res) => {
-  console.log("test");
   fs.readFile("./db/db.json", "utf8", (err, data) => {
     if (err) {
       console.error(err);
     } else {
       // Convert string into JSON object
-      const parsedData = JSON.parse(data);
-      res.json(parsedData);
+      const parsedNotes = JSON.parse(data);
+      res.json(parsedNotes);
+    }
+  });
+});
+
+app.post("/api/notes/", (req, res) => {
+  const { title, text } = req.body;
+
+  const newNote = {
+    id: uuid(),
+    title,
+    text,
+  };
+
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      // Convert string into JSON object
+      const parsedNotes = JSON.parse(data);
+      res.json(parsedNotes);
+      console.log(parsedNotes, newNote);
+      parsedNotes.push(newNote);
+
+      fs.writeFile(
+        "./db/db.json",
+        JSON.stringify(parsedNotes, null, 4),
+        (writeErr) =>
+          writeErr
+            ? console.error(writeErr)
+            : console.info("Successfully updated notes!")
+      );
     }
   });
 });
